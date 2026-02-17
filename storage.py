@@ -16,6 +16,7 @@ from config import (
     GOOGLE_SHEETS_WEBHOOK_URL,
     GOOGLE_SHEETS_CSV_PATH,
     WEBHOOK_TIMEOUT_SECONDS,
+    NICHE_NAME,
 )
 
 DB_PATH = Path(__file__).with_name("leads.db")
@@ -162,6 +163,7 @@ def export_leads_csv(start: date, end: date, output_path: Path) -> Path:
 
 async def push_to_integrations(lead: dict[str, Any]) -> None:
     payload = {
+        "niche": NICHE_NAME,
         "created_at": lead.get("created_at"),
         "name": lead.get("name"),
         "phone": lead.get("phone"),
@@ -187,7 +189,14 @@ async def _post_webhook(url: str, payload: dict[str, Any]) -> None:
         return
     try:
         async with httpx.AsyncClient(timeout=WEBHOOK_TIMEOUT_SECONDS) as client:
-            await client.post(url, json=payload)
+            response = await client.post(url, json=payload)
+            if response.status_code >= 400:
+                logging.error(
+                    "Webhook push failed: %s status=%s body=%s",
+                    url,
+                    response.status_code,
+                    response.text[:500],
+                )
     except Exception:
         logging.exception("Webhook push failed: %s", url)
 

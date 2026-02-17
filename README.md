@@ -44,6 +44,16 @@ python app.py
 Обычно для Google Sheets используют Apps Script Web App или Make/Zapier —
 укажите URL вебхука, и бот будет отправлять JSON.
 
+Пример Apps Script: `docs/google_sheets_appsscript.js`.
+
+## Несколько ниш
+
+Можно запускать разные ниши через разные env-файлы:
+
+```bash
+ENV_FILE=.env.legal python app.py
+```
+
 ## Структура проекта
 
 - `config.py` — настройки ниши и порогов

@@ -27,6 +27,16 @@ from config import (
     ASK_EMAIL,
     BOT_TOKEN,
     NICHE_NAME,
+    INTRO_TEXT,
+    QUESTION_NAME,
+    QUESTION_PHONE,
+    QUESTION_EMAIL,
+    QUESTION_BUDGET,
+    QUESTION_REGION,
+    QUESTION_TIMEFRAME,
+    QUESTION_CONTACTED,
+    THANK_YOU_MESSAGE,
+    DUPLICATE_MESSAGE,
     PHONE_MIN_DIGITS,
     REGION_OPTIONS,
     TIMEFRAME_OPTIONS,
@@ -117,41 +127,37 @@ def build_contact_keyboard() -> ReplyKeyboardMarkup:
 
 async def ask_budget(message: Message, state: FSMContext) -> None:
     await state.set_state(LeadForm.budget)
-    await message.answer("Какую сумму кредита планируете?", reply_markup=build_budget_keyboard())
+    await message.answer(QUESTION_BUDGET, reply_markup=build_budget_keyboard())
 
 
 async def ask_region(message: Message, state: FSMContext) -> None:
     await state.set_state(LeadForm.region)
     if REGION_OPTIONS:
-        await message.answer("В каком регионе хотите взять ипотеку?", reply_markup=build_region_keyboard())
+        await message.answer(QUESTION_REGION, reply_markup=build_region_keyboard())
         return
-    await message.answer("В каком регионе хотите взять ипотеку?")
+    await message.answer(QUESTION_REGION)
 
 
 async def ask_timeframe(message: Message, state: FSMContext) -> None:
     await state.set_state(LeadForm.timeframe)
-    await message.answer("Когда планируете оформить ипотеку?", reply_markup=build_timeframe_keyboard())
+    await message.answer(QUESTION_TIMEFRAME, reply_markup=build_timeframe_keyboard())
 
 
 async def ask_contacted(message: Message, state: FSMContext) -> None:
     await state.set_state(LeadForm.contacted)
-    await message.answer("Уже обращались к банкам или брокерам?", reply_markup=build_yes_no_keyboard("contacted"))
+    await message.answer(QUESTION_CONTACTED, reply_markup=build_yes_no_keyboard("contacted"))
 
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext) -> None:
     await state.clear()
-    greeting = (
-        f"Привет! Я помогу вам подобрать {NICHE_NAME.lower()}.\n"
-        "Ответьте на несколько вопросов — это займёт всего пару минут."
-    )
-    await message.answer(greeting, reply_markup=build_start_keyboard())
+    await message.answer(INTRO_TEXT, reply_markup=build_start_keyboard())
 
 
 @router.callback_query(F.data == "lead_start")
 async def lead_start(callback: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(LeadForm.name)
-    await callback.message.answer("Как вас зовут?")
+    await callback.message.answer(QUESTION_NAME)
     await callback.answer()
 
 
@@ -170,7 +176,7 @@ async def lead_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=name)
     await state.set_state(LeadForm.phone)
     await message.answer(
-        "Поделитесь, пожалуйста, вашим номером телефона.",
+        QUESTION_PHONE,
         reply_markup=build_contact_keyboard(),
     )
 
@@ -198,7 +204,7 @@ async def lead_phone(message: Message, state: FSMContext) -> None:
         skip_keyboard = InlineKeyboardMarkup(
             inline_keyboard=[[InlineKeyboardButton(text="Пропустить", callback_data="skip_email")]]
         )
-        await message.answer("Можете оставить email для получения подробностей.", reply_markup=skip_keyboard)
+        await message.answer(QUESTION_EMAIL, reply_markup=skip_keyboard)
         return
 
     await ask_budget(message, state)
@@ -366,12 +372,10 @@ async def finalize_lead(message: Message, state: FSMContext) -> None:
     await state.clear()
 
     if is_duplicate:
-        await message.answer("Спасибо! Мы уже получили заявку с этим номером и скоро свяжемся.")
+        await message.answer(DUPLICATE_MESSAGE)
         return
 
-    await message.answer(
-        "Спасибо! Мы получили вашу заявку и свяжемся с вами в ближайшее время."
-    )
+    await message.answer(THANK_YOU_MESSAGE)
 
 
 async def notify_admins(bot: Bot, lead: dict) -> None:

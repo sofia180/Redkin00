@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .env
+.env.legal
 leads.db
 app.db
 .DS_Store

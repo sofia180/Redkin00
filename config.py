@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+ENV_FILE = os.getenv("ENV_FILE", ".env")
+load_dotenv(ENV_FILE, override=True)
 
 
 def _split_csv(value: str) -> list[str]:
@@ -21,6 +22,28 @@ ADMIN_IDS = {int(x) for x in _split_csv(os.getenv("ADMIN_IDS", "")) if x.isdigit
 # Niche settings
 NICHE_NAME = os.getenv("NICHE_NAME", "Ипотека")
 CURRENCY_SYMBOL = os.getenv("CURRENCY_SYMBOL", "$")
+
+# Messaging overrides (optional)
+INTRO_TEXT = os.getenv(
+    "INTRO_TEXT",
+    f"Привет! Я помогу вам подобрать {NICHE_NAME.lower()}.\n"
+    "Ответьте на несколько вопросов — это займёт всего пару минут.",
+)
+QUESTION_NAME = os.getenv("QUESTION_NAME", "Как вас зовут?")
+QUESTION_PHONE = os.getenv("QUESTION_PHONE", "Поделитесь, пожалуйста, вашим номером телефона.")
+QUESTION_EMAIL = os.getenv("QUESTION_EMAIL", "Можете оставить email для получения подробностей.")
+QUESTION_BUDGET = os.getenv("QUESTION_BUDGET", "Какую сумму кредита планируете?")
+QUESTION_REGION = os.getenv("QUESTION_REGION", "В каком регионе хотите взять ипотеку?")
+QUESTION_TIMEFRAME = os.getenv("QUESTION_TIMEFRAME", "Когда планируете оформить ипотеку?")
+QUESTION_CONTACTED = os.getenv("QUESTION_CONTACTED", "Уже обращались к банкам или брокерам?")
+THANK_YOU_MESSAGE = os.getenv(
+    "THANK_YOU_MESSAGE",
+    "Спасибо! Мы получили вашу заявку и свяжемся с вами в ближайшее время.",
+)
+DUPLICATE_MESSAGE = os.getenv(
+    "DUPLICATE_MESSAGE",
+    "Спасибо! Мы уже получили заявку с этим номером и скоро свяжемся.",
+)
 
 # Budget brackets
 BUDGET_LOW_MAX = int(os.getenv("BUDGET_LOW_MAX", "100000"))
