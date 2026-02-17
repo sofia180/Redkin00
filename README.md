@@ -54,6 +54,8 @@ python app.py
 ENV_FILE=.env.legal python app.py
 ```
 
+Для юр. ниши используйте шаблон `.env.legal.example`.
+
 ## Структура проекта
 
 - `config.py` — настройки ниши и порогов
